@@ -1,59 +1,57 @@
-# HowToResetInputTypeFileInAngular
+# how-to-reset-input-type-file-in-angular
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.6.
+#### run project
 
-## Development server
+```npm run start```
 
-To start a local development server, run:
+## Why
 
-```bash
-ng serve
+When a user selects a file using an input element with the type of file i.e `<input type="file">`
+the input fires a `(change)` and also creates an in-memory snapshot of the file's state.
+
+If the file is edited before it is uploaded, 
+it will not update the file input's snapshot.
+
+The user might try and fix this by selecting the file again, 
+but the input will not fire the `(change)` event nor update its snapshot,
+because the file input will not update if the file-name/input string has not changed.
+
+To fix this we can set the input elements input string to an empty string i.e. `input.value = '';`
+
+## Post
+
+
+```typescript
+import { Component, signal } from '@angular/core';
+
+@Component({
+    template: `
+        <input #fileInput type="file" (change)="updateFileName(fileInput)">
+        <h3> {{fileName()}} </h3>
+    `,
+})
+export class App {
+    fileName = signal('');
+
+    updateFileName(input: HTMLInputElement) {
+        if (input.files && input.files.length > 0) {
+            this.fileName.set(input.files[0].name);
+            input.value = '';
+        }
+    }
+}
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
+<details>
+<summary><b>Summary of Modern Angular Changes (v2–16 vs. v17+)</b></summary>
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- fyi standalone is the new default
 
-```bash
-ng generate component component-name
-```
+| Category         | Pre-Angular 17 (v2–16) | Modern Angular (v17+)                      |
+|:-----------------|:-----------------------|:-------------------------------------------|
+| **Reactivity**   | `zone.js`              | `signals`                                  |
+| **Architecture** | `NgModules`            | `standalone components, default since v19` |
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+</details>

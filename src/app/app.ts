@@ -1,15 +1,19 @@
 import { Component, signal } from '@angular/core';
 
 @Component({
-  imports: [],
-  selector: 'app-root',
-  styles: [],
-  template: `
-    <h1>Hello, {{ title() }}</h1>
-
-    
-  `,
+    selector: 'app-root',
+    template: `
+        <input #fileInput type="file" (change)="updateFileName(fileInput)">
+        <h3> {{fileName()}} </h3>
+    `,
 })
 export class App {
-  protected readonly title = signal('how-to-reset-input-type-file-in-angular');
+    fileName = signal('');
+
+    updateFileName(input: HTMLInputElement) {
+        if (input.files && input.files.length > 0) {
+            this.fileName.set(input.files[0].name);
+            input.value = '';
+        }
+    }
 }
